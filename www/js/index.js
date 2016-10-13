@@ -36,8 +36,8 @@ function onDeviceReady() {
     errorHandler('resolve error')
   );
   window.requestFileSystem(
-    window.TEMPORARY,
-    1024 * 1024,
+    LocalFileSystem.PERSISTENT,
+    0,
     function onInitFs(fs) {
       log('Opened file system: ' + fs.name);
       var dirReader = fs.root.createReader();
@@ -50,7 +50,7 @@ function onDeviceReady() {
             if (!results.length) {
               log(entries.sort());
             } else {
-              results.forEach(entry => log(entry.name));
+              results.forEach(entry => log(entry.isDirectory + '  ' + entry.name));
               readEntries();
             }
           },
