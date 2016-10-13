@@ -50,7 +50,7 @@ function onDeviceReady() {
             if (!results.length) {
               log(entries.sort());
             } else {
-              results.forEach(log);
+              results.forEach(entry => log(entry.name));
               readEntries();
             }
           },
