@@ -1,5 +1,5 @@
 $(function() {
-   var $msg = $('#msg');
+  var $msg = $('#msg');
 
   function log(text) {
     $msg.html($msg.html() + text + '\n');
@@ -22,7 +22,7 @@ $(function() {
     var directoryReader = dir.createReader();
     directoryReader.readEntries(
       function(results) {
-        results.forEach(function (fileEntry) {
+        results.forEach(function(fileEntry) {
           if (fileEntry.isFile) {
             log(key + ' / ' + fileEntry.fullPath);
             entries.push(fileEntry);
@@ -37,8 +37,8 @@ $(function() {
   }
 
   function playMusic(fileEntry) {
-    $play.prop( "disabled", false );
-    $stop.prop( "disabled", false );
+    $play.prop("disabled", false);
+    $stop.prop("disabled", false);
     myMedia = new Media(
       fileEntry.toURL(),
       function mediaSuccess() {
@@ -70,13 +70,30 @@ $(function() {
     'deviceready',
     function onDeviceReady() {
       log('deviceready');
-
-      Object.keys(cordova.file).forEach(function (key) {
+      if (window.sqlitePlugin) {
+        window.sqlitePlugin.echoTest(
+          function() {
+            log('ECHO test OK');
+          },
+          function(error) {
+            log('Echo test ' + error);
+          }
+        );
+        window.sqlitePlugin.selfTest(
+          function() {
+            log('SELF test OK');
+          },
+          function(error) {
+            log('Self test ' + error);
+          }
+        );
+      } else log('sqlitePlugin not found');
+      Object.keys(cordova.file).forEach(function(key) {
         if (cordova.file[key]) {
           log('key: ' + key + ': ' + cordova.file[key] + 'Music');
           window.resolveLocalFileSystemURL(
             cordova.file[key] + 'Music',
-            function (dir) {
+            function(dir) {
               entryReader(dir, key);
             },
             entryReader,
