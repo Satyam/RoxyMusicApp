@@ -20,70 +20,67 @@ function errorHandler(prefix) {
 
 function onDeviceReady() {
 
-
-  window.resolveLocalFileSystemURL(
-    "file:///android_asset/music.mp3",
-    function onResolved(f) {
-      log('resolved music', f);
-    },
-    errorHandler('resolve error')
-  );
-  window.resolveLocalFileSystemURL(
-    "file:///android_asset/config.xml",
-    function onResolved(f) {
-      log('resolved config', f);
-    },
-    errorHandler('resolve error')
-  );
-  window.requestFileSystem(
-    LocalFileSystem.PERSISTENT,
-    0,
-    function onInitFs(fs) {
-      log('Opened file system: ' + fs.name);
-      var dirReader = fs.root.createReader();
-      var entries = [];
-
-      // Call the reader.readEntries() until no more results are returned.
-      var readEntries = function() {
-        dirReader.readEntries(
-          function(results) {
-            if (!results.length) {
-              log(entries.sort());
-            } else {
+  Object.keys(cordova.file).forEach(function (key) {
+    if (cordova.file[key]) {
+      log('key: ' + key + ': ' + cordova.file[key]);
+      window.resolveLocalFileSystemURL(
+        cordova.file[key],
+        function(dir) {
+          var directoryReader = dir.createReader();
+          directoryReader.readEntries(
+            function(results) {
               results.forEach(entry => log(entry.isDirectory + '  ' + entry.name));
-              readEntries();
-            }
-          },
-          errorHandler('readentries')
-        );
-      };
-
-      readEntries(); // Start reading dirs.
-      fs.root.getFile(
-        'music.mp3', {
-          create: false,
-          exclusive: true
-        },
-        function(fileEntry) {
-          log('name: ' + fileEntry.name);
-          log('fullPath: ' + fileEntry.fullPath);
-          log('url: ' + fileEntry.toURL());
-          myMedia = new Media(
-            fileEntry.toURL(),
-            function mediaSuccess() {
-              log('media success called');
             },
-            errorHandler('media failure called'),
-            function mediaStatusChange(status) {
-              log('media status change: ' + status);
-            }
+            errorHandler('readentries')
           );
         },
-        errorHandler('get file error')
+        errorHandler('resolve')
       );
-    },
-    errorHandler('fs error')
-  );
+    }
+  })
+
+  // window.requestFileSystem(
+  //   LocalFileSystem.PERSISTENT,
+  //   0,
+  //   function onInitFs(fs) {
+  //     log('Opened file system: ' + fs.name);
+  //     var directoryReader = fs.root.createReader();
+  //     directoryReader.readEntries(
+  //       function(results) {
+  //         results.forEach(entry => log(entry.isDirectory + '  ' + entry.name));
+  //       },
+  //       errorHandler('readentries')
+  //     );
+  //     // fs.root.getDirectory(
+  //     //   cordova.file.dataDirectory, {
+  //     //     create: false,
+  //     //     exclusive: false
+  //     //   },
+  //     //   function getDirSuccess(dirEntry) {
+  //     //     var directoryReader = dirEntry.createReader();
+  //     //     directoryReader.readEntries(
+  //     //       function(results) {
+  //     //         results.forEach(entry => log(entry.isDirectory + '  ' + entry.name));
+  //     //       },
+  //     //       errorHandler('readentries')
+  //     //     );
+  //     //   },
+  //     //   errorHandler('getDirectory')
+  //     // );
+  //
+  //     // myMedia = new Media(
+  //     //   fileEntry.toURL(),
+  //     //   function mediaSuccess() {
+  //     //     log('media success called');
+  //     //   },
+  //     //   errorHandler('media failure called'),
+  //     //   function mediaStatusChange(status) {
+  //     //     log('media status change: ' + status);
+  //     //   }
+  //     // );
+  //   },
+  //   errorHandler('fs error')
+  // );
   play.addEventListener('click', function(ev) {
     if (playing) {
       myMedia.pause();
