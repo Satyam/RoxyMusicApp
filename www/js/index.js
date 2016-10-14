@@ -18,13 +18,15 @@ function errorHandler(prefix) {
   }
 }
 
+
 function onDeviceReady() {
+  log('working');
 
   Object.keys(cordova.file).forEach(function (key) {
     if (cordova.file[key]) {
       log('key: ' + key + ': ' + cordova.file[key]);
       window.resolveLocalFileSystemURL(
-        cordova.file[key],
+        cordova.file[key] + 'Music',
         function(dir) {
           var directoryReader = dir.createReader();
           directoryReader.readEntries(
