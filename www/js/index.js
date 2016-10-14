@@ -1,99 +1,91 @@
-document.addEventListener('deviceready', onDeviceReady, false);
+$(function() {
+   var $msg = $('#msg');
 
-var msg = document.getElementById('msg');
-
-function log(m) {
-  msg.innerHTML = msg.innerHTML + '\n' + m;
-}
-
-var play = document.getElementById('play');
-var stop = document.getElementById('stop');
-var playing = false;
-var myMedia;
-
-function errorHandler(prefix) {
-  return function(err) {
-    log(prefix + ':' + err.message);
-    console.log(prefix + ':' + err.message);
+  function log(text) {
+    $msg.html($msg.html() + text + '\n');
   }
-}
 
+  var $play = $('#play');
+  var $stop = $('#stop');
+  var playing = false;
+  var myMedia;
 
-function onDeviceReady() {
-  log('working');
+  function errorHandler(prefix) {
+    return function(err) {
+      log(prefix + ':' + err.message);
+      console.log(prefix + ':' + err.message);
+    };
+  }
+  var entries = [];
 
-  Object.keys(cordova.file).forEach(function (key) {
-    if (cordova.file[key]) {
-      log('key: ' + key + ': ' + cordova.file[key]);
-      window.resolveLocalFileSystemURL(
-        cordova.file[key] + 'Music',
-        function(dir) {
-          var directoryReader = dir.createReader();
-          directoryReader.readEntries(
-            function(results) {
-              results.forEach(entry => log(entry.isDirectory + '  ' + entry.name));
-            },
-            errorHandler('readentries')
-          );
-        },
-        errorHandler('resolve')
-      );
-    }
-  })
+  function entryReader(dir, key) {
+    var directoryReader = dir.createReader();
+    directoryReader.readEntries(
+      function(results) {
+        results.forEach(function (fileEntry) {
+          if (fileEntry.isFile) {
+            log(key + ' / ' + fileEntry.fullPath);
+            entries.push(fileEntry);
+            if (!myMedia) {
+              playMusic(fileEntry);
+            }
+          }
+        });
+      },
+      errorHandler('readentries')
+    );
+  }
 
-  // window.requestFileSystem(
-  //   LocalFileSystem.PERSISTENT,
-  //   0,
-  //   function onInitFs(fs) {
-  //     log('Opened file system: ' + fs.name);
-  //     var directoryReader = fs.root.createReader();
-  //     directoryReader.readEntries(
-  //       function(results) {
-  //         results.forEach(entry => log(entry.isDirectory + '  ' + entry.name));
-  //       },
-  //       errorHandler('readentries')
-  //     );
-  //     // fs.root.getDirectory(
-  //     //   cordova.file.dataDirectory, {
-  //     //     create: false,
-  //     //     exclusive: false
-  //     //   },
-  //     //   function getDirSuccess(dirEntry) {
-  //     //     var directoryReader = dirEntry.createReader();
-  //     //     directoryReader.readEntries(
-  //     //       function(results) {
-  //     //         results.forEach(entry => log(entry.isDirectory + '  ' + entry.name));
-  //     //       },
-  //     //       errorHandler('readentries')
-  //     //     );
-  //     //   },
-  //     //   errorHandler('getDirectory')
-  //     // );
-  //
-  //     // myMedia = new Media(
-  //     //   fileEntry.toURL(),
-  //     //   function mediaSuccess() {
-  //     //     log('media success called');
-  //     //   },
-  //     //   errorHandler('media failure called'),
-  //     //   function mediaStatusChange(status) {
-  //     //     log('media status change: ' + status);
-  //     //   }
-  //     // );
-  //   },
-  //   errorHandler('fs error')
-  // );
-  play.addEventListener('click', function(ev) {
+  function playMusic(fileEntry) {
+    $play.prop( "disabled", false );
+    $stop.prop( "disabled", false );
+    myMedia = new Media(
+      fileEntry.toURL(),
+      function mediaSuccess() {
+        log('media success called');
+      },
+      errorHandler('media failure called'),
+      function mediaStatusChange(status) {
+        log('media status change: ' + status);
+      }
+    );
+  }
+  $play.click(function() {
     if (playing) {
       myMedia.pause();
-      play.innerHTML = 'play';
+      $play.html('play');
     } else {
       myMedia.play();
-      play.innerHTML = 'pause';
+      $play.html('pause');
     }
     playing = !playing;
   });
-  stop.addEventListener('click', function(ev) {
+  $stop.click(function() {
     myMedia.stop();
   });
-};
+
+  log('about to add event listener');
+
+  document.addEventListener(
+    'deviceready',
+    function onDeviceReady() {
+      log('deviceready');
+
+      Object.keys(cordova.file).forEach(function (key) {
+        if (cordova.file[key]) {
+          log('key: ' + key + ': ' + cordova.file[key] + 'Music');
+          window.resolveLocalFileSystemURL(
+            cordova.file[key] + 'Music',
+            function (dir) {
+              entryReader(dir, key);
+            },
+            entryReader,
+            errorHandler('resolve')
+          );
+        }
+      });
+
+    },
+    false
+  );
+});

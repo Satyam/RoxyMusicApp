@@ -1,12 +1,16 @@
 {
-  "name": "phonegap-template-hello-world",
+  "name": "roxy-music-app",
   "version": "4.0.2",
-  "description": "> A Hello World template built with PhoneGap",
+  "description": "RoxyMusic Android App",
   "repository": {
     "type": "git",
-    "url": "https://github.com/phonegap/phonegap-app-hello-world.git"
+    "url": "https://github.com/Satyam/RoxyMusicApp.git"
   },
-  "author": "PhoneGap Team",
+  "author": "Daniel Barreiro",
+  "scripts": {
+    "lint": "eslint . || exit 0",
+    "start": "phonegap serve"
+  },
   "license": "Apache-2.0.0",
   "keywords": [
     "ecosystem:phonegap",
@@ -15,7 +19,11 @@
     "phonegap:template"
   ],
   "bugs": {
-    "url": "https://github.com/phonegap/phonegap-app-hello-world/issues"
+    "url": "https://github.com/Satyam/RoxyMusicApp/issues"
   },
-  "homepage": "https://github.com/phonegap/phonegap-app-hello-world"
+  "homepage": "https://github.com/Satyam/RoxyMusicApp",
+  "devDependencies": {
+    "eslint": "^3.7.1",
+    "eslint-plugin-react": "^6.4.1"
+  }
 }
