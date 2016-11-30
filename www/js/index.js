@@ -19,21 +19,25 @@ $(function() {
   var entries = [];
 
   function entryReader(dir, key) {
-    var directoryReader = dir.createReader();
-    directoryReader.readEntries(
-      function(results) {
-        results.forEach(function(fileEntry) {
-          if (fileEntry.isFile) {
-            log(key + ' / ' + fileEntry.fullPath);
-            entries.push(fileEntry);
-            if (!myMedia) {
-              playMusic(fileEntry);
+    if (dir.createReader) {
+      var directoryReader = dir.createReader();
+      directoryReader.readEntries(
+        function(results) {
+          results.forEach(function(fileEntry) {
+            if (fileEntry.isFile) {
+              log(key + ' / ' + fileEntry.fullPath);
+              entries.push(fileEntry);
+              if (!myMedia) {
+                playMusic(fileEntry);
+              }
             }
-          }
-        });
-      },
-      errorHandler('readentries')
-    );
+          });
+        },
+        errorHandler('readentries')
+      );
+    } else {
+      log(dir.name + ' does not have createReader (key:)' + key);
+    }
   }
 
   function playMusic(fileEntry) {
@@ -96,7 +100,6 @@ $(function() {
             function(dir) {
               entryReader(dir, key);
             },
-            entryReader,
             errorHandler('resolve')
           );
         }

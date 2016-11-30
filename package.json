@@ -9,7 +9,9 @@
   "author": "Daniel Barreiro",
   "scripts": {
     "lint": "eslint . || exit 0",
-    "start": "phonegap serve"
+    "prestart": "cp ../RoxyMusic/bundles/phonegap* www/js && cp ../RoxyMusic/server/data.sql www/res",
+    "start": "phonegap serve",
+    "copy": "cp ../RoxyMusic/bundles/phonegap* www/js  && cp ../RoxyMusic/server/data.sql www/res"
   },
   "license": "Apache-2.0.0",
   "keywords": [
