@@ -63,15 +63,15 @@
 	
 	var _denodeify2 = _interopRequireDefault(_denodeify);
 	
-	var _openCordovaWebSql = __webpack_require__(/*! _server/utils/openCordovaWebSql */ 904);
+	var _openCordovaWebSql = __webpack_require__(/*! _server/utils/openCordovaWebSql */ 813);
 	
 	var _openCordovaWebSql2 = _interopRequireDefault(_openCordovaWebSql);
 	
-	var _webSqlP = __webpack_require__(/*! _server/utils/webSqlP */ 813);
+	var _webSqlP = __webpack_require__(/*! _server/utils/webSqlP */ 814);
 	
 	var _webSqlP2 = _interopRequireDefault(_webSqlP);
 	
-	var _server = __webpack_require__(/*! _server */ 815);
+	var _server = __webpack_require__(/*! _server */ 816);
 	
 	var _server2 = _interopRequireDefault(_server);
 	
@@ -79,21 +79,33 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	/* global window, cordova */
 	var unlink = (0, _denodeify2.default)(_fs2.default.unlink);
 	var readFile = (0, _denodeify2.default)(_fs2.default.readFile);
 	
-	window.document.addEventListener('deviceready', function () {
+	function log(msg) {
+	  var el = document.getElementById('log');
+	  if (!el) alert('el not found');
+	  el.innerHTML = el.innerHTML + '<pre>' + msg + '</pre>';
+	}
+	
+	log('comenzando');
+	
+	document.addEventListener('deviceready', function () {
+	  log('arranque');
 	  var DELDB = false;
 	  var musicDb = (0, _path.join)(cordova.file.externalRootDirectory, 'Music/RoxyMusic.db');
 	
+	  log('musicdb: ' + musicDb);
 	  (DELDB ? unlink(musicDb) : Promise.resolve()).then(function () {
 	    return (0, _openCordovaWebSql2.default)(musicDb);
 	  }).then(function (rawDb) {
+	    log('database opened');
 	    return new _webSqlP2.default(rawDb);
 	  }).then(function (db) {
 	    return db.get('select count(*) as c  from sqlite_master').then(function (row) {
+	      log('red row ' + JSON.stringify(row));
 	      return row.c === 0 ? readFile((0, _path.join)(cordova.file.applicationDirectory, 'res/data.sql'), 'utf8').then(function (data) {
+	        log('data read ' + data.substr(0, 200));
 	        return db.exec(data);
 	      }).then(function () {
 	        return db;
@@ -102,7 +114,7 @@
 	  }).then(function (db) {
 	    return (0, _server2.default)(db, _restAPI.addRoute);
 	  }).then(_client2.default).catch(function (err) {
-	    window.document.getElementById('contents').innerHTML = err;
+	    log('catch: ' + err);
 	  });
 	}, false);
 
@@ -58401,6 +58413,40 @@
 
 /***/ },
 /* 813 */
+/*!*******************************************!*\
+  !*** ./server/utils/openCordovaWebSql.js ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _path = __webpack_require__(/*! path */ 501);
+	
+	var _path2 = _interopRequireDefault(_path);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	/* global window, cordova */
+	exports.default = function (filename) {
+	  return new Promise(function (resolve, reject) {
+	    if (window && window.sqlitePlugin) {
+	      window.resolveLocalFileSystemURL(_path2.default.dirname(filename), // `${cordova.file.externalRootDirectory}/Music`,
+	      function (externalDataDirectoryEntry) {
+	        resolve(window.sqlitePlugin.openDatabase({
+	          name: _path2.default.basename(filename),
+	          androidDatabaseLocation: externalDataDirectoryEntry.toURL()
+	        }));
+	      }, reject);
+	    } else reject('sqlitePlugin no found');
+	  });
+	};
+
+/***/ },
+/* 814 */
 /*!*********************************!*\
   !*** ./server/utils/webSqlP.js ***!
   \*********************************/
@@ -58414,7 +58460,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _websql = __webpack_require__(/*! websql */ 814);
+	var _websql = __webpack_require__(/*! websql */ 815);
 	
 	var _websql2 = _interopRequireDefault(_websql);
 	
@@ -58723,7 +58769,7 @@
 	exports.default = DB;
 
 /***/ },
-/* 814 */
+/* 815 */
 /*!*********************************!*\
   !*** ./~/websql/lib/browser.js ***!
   \*********************************/
@@ -58736,7 +58782,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 815 */
+/* 816 */
 /*!*************************!*\
   !*** ./server/index.js ***!
   \*************************/
@@ -58776,44 +58822,44 @@
 	  });
 	};
 	
-	var _forEach = __webpack_require__(/*! lodash/forEach */ 816);
+	var _forEach = __webpack_require__(/*! lodash/forEach */ 817);
 	
 	var _forEach2 = _interopRequireDefault(_forEach);
 	
 	var _path = __webpack_require__(/*! path */ 501);
 	
-	var _albums = __webpack_require__(/*! ./albums */ 818);
+	var _albums = __webpack_require__(/*! ./albums */ 819);
 	
 	var _albums2 = _interopRequireDefault(_albums);
 	
-	var _playlists = __webpack_require__(/*! ./playlists */ 821);
+	var _playlists = __webpack_require__(/*! ./playlists */ 822);
 	
 	var _playlists2 = _interopRequireDefault(_playlists);
 	
-	var _artists = __webpack_require__(/*! ./artists */ 823);
+	var _artists = __webpack_require__(/*! ./artists */ 824);
 	
 	var _artists2 = _interopRequireDefault(_artists);
 	
-	var _songs = __webpack_require__(/*! ./songs */ 824);
+	var _songs = __webpack_require__(/*! ./songs */ 825);
 	
 	var _songs2 = _interopRequireDefault(_songs);
 	
-	var _tracks = __webpack_require__(/*! ./tracks */ 825);
+	var _tracks = __webpack_require__(/*! ./tracks */ 826);
 	
 	var _tracks2 = _interopRequireDefault(_tracks);
 	
-	var _refreshDb = __webpack_require__(/*! ./refreshDb */ 826);
+	var _refreshDb = __webpack_require__(/*! ./refreshDb */ 827);
 	
 	var _refreshDb2 = _interopRequireDefault(_refreshDb);
 	
-	var _config = __webpack_require__(/*! ./config */ 822);
+	var _config = __webpack_require__(/*! ./config */ 823);
 	
 	var _config2 = _interopRequireDefault(_config);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ },
-/* 816 */
+/* 817 */
 /*!*****************************!*\
   !*** ./~/lodash/forEach.js ***!
   \*****************************/
@@ -58821,7 +58867,7 @@
 
 	var arrayEach = __webpack_require__(/*! ./_arrayEach */ 381),
 	    baseEach = __webpack_require__(/*! ./_baseEach */ 568),
-	    castFunction = __webpack_require__(/*! ./_castFunction */ 817),
+	    castFunction = __webpack_require__(/*! ./_castFunction */ 818),
 	    isArray = __webpack_require__(/*! ./isArray */ 350);
 	
 	/**
@@ -58863,7 +58909,7 @@
 
 
 /***/ },
-/* 817 */
+/* 818 */
 /*!***********************************!*\
   !*** ./~/lodash/_castFunction.js ***!
   \***********************************/
@@ -58886,7 +58932,7 @@
 
 
 /***/ },
-/* 818 */
+/* 819 */
 /*!**************************!*\
   !*** ./server/albums.js ***!
   \**************************/
@@ -58901,11 +58947,11 @@
 	exports.getAlbums = getAlbums;
 	exports.getAlbum = getAlbum;
 	
-	var _validators = __webpack_require__(/*! _server/utils/validators */ 819);
+	var _validators = __webpack_require__(/*! _server/utils/validators */ 820);
 	
 	var validators = _interopRequireWildcard(_validators);
 	
-	var _splitIdTracks = __webpack_require__(/*! _server/utils/splitIdTracks */ 820);
+	var _splitIdTracks = __webpack_require__(/*! _server/utils/splitIdTracks */ 821);
 	
 	var _splitIdTracks2 = _interopRequireDefault(_splitIdTracks);
 	
@@ -58959,7 +59005,7 @@
 	};
 
 /***/ },
-/* 819 */
+/* 820 */
 /*!************************************!*\
   !*** ./server/utils/validators.js ***!
   \************************************/
@@ -58997,7 +59043,7 @@
 	}
 
 /***/ },
-/* 820 */
+/* 821 */
 /*!***************************************!*\
   !*** ./server/utils/splitIdTracks.js ***!
   \***************************************/
@@ -59018,7 +59064,7 @@
 	}
 
 /***/ },
-/* 821 */
+/* 822 */
 /*!*****************************!*\
   !*** ./server/playlists.js ***!
   \*****************************/
@@ -59049,15 +59095,15 @@
 	
 	var _fs2 = _interopRequireDefault(_fs);
 	
-	var _validators = __webpack_require__(/*! _server/utils/validators */ 819);
+	var _validators = __webpack_require__(/*! _server/utils/validators */ 820);
 	
 	var validators = _interopRequireWildcard(_validators);
 	
-	var _splitIdTracks = __webpack_require__(/*! _server/utils/splitIdTracks */ 820);
+	var _splitIdTracks = __webpack_require__(/*! _server/utils/splitIdTracks */ 821);
 	
 	var _splitIdTracks2 = _interopRequireDefault(_splitIdTracks);
 	
-	var _config = __webpack_require__(/*! _server/config */ 822);
+	var _config = __webpack_require__(/*! _server/config */ 823);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -59174,7 +59220,7 @@
 	};
 
 /***/ },
-/* 822 */
+/* 823 */
 /*!**************************!*\
   !*** ./server/config.js ***!
   \**************************/
@@ -59315,7 +59361,7 @@
 	};
 
 /***/ },
-/* 823 */
+/* 824 */
 /*!***************************!*\
   !*** ./server/artists.js ***!
   \***************************/
@@ -59330,11 +59376,11 @@
 	exports.getArtists = getArtists;
 	exports.getArtist = getArtist;
 	
-	var _validators = __webpack_require__(/*! _server/utils/validators */ 819);
+	var _validators = __webpack_require__(/*! _server/utils/validators */ 820);
 	
 	var validators = _interopRequireWildcard(_validators);
 	
-	var _splitIdTracks = __webpack_require__(/*! _server/utils/splitIdTracks */ 820);
+	var _splitIdTracks = __webpack_require__(/*! _server/utils/splitIdTracks */ 821);
 	
 	var _splitIdTracks2 = _interopRequireDefault(_splitIdTracks);
 	
@@ -59388,7 +59434,7 @@
 	};
 
 /***/ },
-/* 824 */
+/* 825 */
 /*!*************************!*\
   !*** ./server/songs.js ***!
   \*************************/
@@ -59437,7 +59483,7 @@
 	};
 
 /***/ },
-/* 825 */
+/* 826 */
 /*!**************************!*\
   !*** ./server/tracks.js ***!
   \**************************/
@@ -59451,7 +59497,7 @@
 	exports.init = init;
 	exports.getTracks = getTracks;
 	
-	var _validators = __webpack_require__(/*! _server/utils/validators */ 819);
+	var _validators = __webpack_require__(/*! _server/utils/validators */ 820);
 	
 	var validators = _interopRequireWildcard(_validators);
 	
@@ -59479,7 +59525,7 @@
 	};
 
 /***/ },
-/* 826 */
+/* 827 */
 /*!*****************************!*\
   !*** ./server/refreshDb.js ***!
   \*****************************/
@@ -59513,19 +59559,19 @@
 	
 	var _path2 = _interopRequireDefault(_path);
 	
-	var _choke = __webpack_require__(/*! _server/utils/choke */ 828);
+	var _choke = __webpack_require__(/*! _server/utils/choke */ 829);
 	
-	var _config = __webpack_require__(/*! _server/config */ 822);
+	var _config = __webpack_require__(/*! _server/config */ 823);
 	
 	var _omit = __webpack_require__(/*! lodash/omit */ 373);
 	
 	var _omit2 = _interopRequireDefault(_omit);
 	
-	var _mp3Duration = __webpack_require__(/*! mp3-duration */ 829);
+	var _mp3Duration = __webpack_require__(/*! mp3-duration */ 830);
 	
 	var _mp3Duration2 = _interopRequireDefault(_mp3Duration);
 	
-	var _musicmetadata = __webpack_require__(/*! musicmetadata */ 859);
+	var _musicmetadata = __webpack_require__(/*! musicmetadata */ 860);
 	
 	var _musicmetadata2 = _interopRequireDefault(_musicmetadata);
 	
@@ -59851,10 +59897,10 @@
 	    };
 	  });
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/timers-browserify/main.js */ 827).setImmediate))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/timers-browserify/main.js */ 828).setImmediate))
 
 /***/ },
-/* 827 */
+/* 828 */
 /*!*****************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/timers-browserify/main.js ***!
   \*****************************************************************/
@@ -59936,10 +59982,10 @@
 	exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
 	  delete immediateIds[id];
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/timers-browserify/main.js */ 827).setImmediate, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/timers-browserify/main.js */ 827).clearImmediate))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/timers-browserify/main.js */ 828).setImmediate, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/timers-browserify/main.js */ 828).clearImmediate))
 
 /***/ },
-/* 828 */
+/* 829 */
 /*!*******************************!*\
   !*** ./server/utils/choke.js ***!
   \*******************************/
@@ -59975,7 +60021,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 829 */
+/* 830 */
 /*!*********************************!*\
   !*** ./~/mp3-duration/index.js ***!
   \*********************************/
@@ -59984,8 +60030,8 @@
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict';
 	
 	var fs        = __webpack_require__(/*! fs */ 808)
-	  , suspend   = __webpack_require__(/*! suspend */ 834)
-	  , promisify = __webpack_require__(/*! promisify */ 838).cb_func()
+	  , suspend   = __webpack_require__(/*! suspend */ 835)
+	  , promisify = __webpack_require__(/*! promisify */ 839).cb_func()
 	
 	  , $open  = promisify(fs.open)           //(filename, flags [, mode])
 	  , $read  = promisify(fs.read).bind(fs)  //(fd, buffer, bufferOffset, length, position)
@@ -60192,10 +60238,10 @@
 	
 	module.exports = mp3Duration;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer))
 
 /***/ },
-/* 830 */
+/* 831 */
 /*!*******************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/buffer/index.js ***!
   \*******************************************************/
@@ -60211,9 +60257,9 @@
 	
 	'use strict'
 	
-	var base64 = __webpack_require__(/*! base64-js */ 831)
-	var ieee754 = __webpack_require__(/*! ieee754 */ 832)
-	var isArray = __webpack_require__(/*! isarray */ 833)
+	var base64 = __webpack_require__(/*! base64-js */ 832)
+	var ieee754 = __webpack_require__(/*! ieee754 */ 833)
+	var isArray = __webpack_require__(/*! isarray */ 834)
 	
 	exports.Buffer = Buffer
 	exports.SlowBuffer = SlowBuffer
@@ -61991,10 +62037,10 @@
 	  return val !== val // eslint-disable-line no-self-compare
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer, (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer, (function() { return this; }())))
 
 /***/ },
-/* 831 */
+/* 832 */
 /*!*******************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/buffer/~/base64-js/index.js ***!
   \*******************************************************************/
@@ -62117,7 +62163,7 @@
 
 
 /***/ },
-/* 832 */
+/* 833 */
 /*!*****************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/buffer/~/ieee754/index.js ***!
   \*****************************************************************/
@@ -62210,7 +62256,7 @@
 
 
 /***/ },
-/* 833 */
+/* 834 */
 /*!*****************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/buffer/~/isarray/index.js ***!
   \*****************************************************************/
@@ -62224,13 +62270,13 @@
 
 
 /***/ },
-/* 834 */
+/* 835 */
 /*!*************************************************!*\
   !*** ./~/mp3-duration/~/suspend/lib/suspend.js ***!
   \*************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(setImmediate) {var Promise = __webpack_require__(/*! promise/lib/es6-extensions */ 835);
+	/* WEBPACK VAR INJECTION */(function(setImmediate) {var Promise = __webpack_require__(/*! promise/lib/es6-extensions */ 836);
 	
 	/**
 	 * Our suspend namespace, which doubles as an alias for `suspend.fn` (although
@@ -62571,10 +62617,10 @@
 		return v && v.constructor && v.constructor.name === 'GeneratorFunction';
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/timers-browserify/main.js */ 827).setImmediate))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/timers-browserify/main.js */ 828).setImmediate))
 
 /***/ },
-/* 835 */
+/* 836 */
 /*!******************************************************************!*\
   !*** ./~/mp3-duration/~/suspend/~/promise/lib/es6-extensions.js ***!
   \******************************************************************/
@@ -62584,8 +62630,8 @@
 	
 	//This file contains the ES6 extensions to the core Promises/A+ API
 	
-	var Promise = __webpack_require__(/*! ./core.js */ 836)
-	var asap = __webpack_require__(/*! asap */ 837)
+	var Promise = __webpack_require__(/*! ./core.js */ 837)
+	var asap = __webpack_require__(/*! asap */ 838)
 	
 	module.exports = Promise
 	
@@ -62691,7 +62737,7 @@
 
 
 /***/ },
-/* 836 */
+/* 837 */
 /*!********************************************************!*\
   !*** ./~/mp3-duration/~/suspend/~/promise/lib/core.js ***!
   \********************************************************/
@@ -62699,7 +62745,7 @@
 
 	'use strict';
 	
-	var asap = __webpack_require__(/*! asap */ 837)
+	var asap = __webpack_require__(/*! asap */ 838)
 	
 	module.exports = Promise;
 	function Promise(fn) {
@@ -62805,7 +62851,7 @@
 
 
 /***/ },
-/* 837 */
+/* 838 */
 /*!***********************************************************!*\
   !*** ./~/mp3-duration/~/suspend/~/promise/~/asap/asap.js ***!
   \***********************************************************/
@@ -62925,10 +62971,10 @@
 	module.exports = asap;
 	
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39), __webpack_require__(/*! (webpack)/~/node-libs-browser/~/timers-browserify/main.js */ 827).setImmediate))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39), __webpack_require__(/*! (webpack)/~/node-libs-browser/~/timers-browserify/main.js */ 828).setImmediate))
 
 /***/ },
-/* 838 */
+/* 839 */
 /*!*************************************************!*\
   !*** ./~/mp3-duration/~/promisify/promisify.js ***!
   \*************************************************/
@@ -62936,8 +62982,8 @@
 
 	'use strict';
 	
-	var when = __webpack_require__(/*! when */ 839);
-	var PStream = __webpack_require__(/*! ./pstream */ 858);
+	var when = __webpack_require__(/*! when */ 840);
+	var PStream = __webpack_require__(/*! ./pstream */ 859);
 	
 	function identity(x) {
 	    return x;
@@ -63087,7 +63133,7 @@
 
 
 /***/ },
-/* 839 */
+/* 840 */
 /*!***************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/when.js ***!
   \***************************************************/
@@ -63104,24 +63150,24 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	
-		var timed = __webpack_require__(/*! ./lib/decorators/timed */ 840);
-		var array = __webpack_require__(/*! ./lib/decorators/array */ 844);
-		var flow = __webpack_require__(/*! ./lib/decorators/flow */ 847);
-		var fold = __webpack_require__(/*! ./lib/decorators/fold */ 848);
-		var inspect = __webpack_require__(/*! ./lib/decorators/inspect */ 849);
-		var generate = __webpack_require__(/*! ./lib/decorators/iterate */ 850);
-		var progress = __webpack_require__(/*! ./lib/decorators/progress */ 851);
-		var withThis = __webpack_require__(/*! ./lib/decorators/with */ 852);
-		var unhandledRejection = __webpack_require__(/*! ./lib/decorators/unhandledRejection */ 853);
-		var TimeoutError = __webpack_require__(/*! ./lib/TimeoutError */ 843);
+		var timed = __webpack_require__(/*! ./lib/decorators/timed */ 841);
+		var array = __webpack_require__(/*! ./lib/decorators/array */ 845);
+		var flow = __webpack_require__(/*! ./lib/decorators/flow */ 848);
+		var fold = __webpack_require__(/*! ./lib/decorators/fold */ 849);
+		var inspect = __webpack_require__(/*! ./lib/decorators/inspect */ 850);
+		var generate = __webpack_require__(/*! ./lib/decorators/iterate */ 851);
+		var progress = __webpack_require__(/*! ./lib/decorators/progress */ 852);
+		var withThis = __webpack_require__(/*! ./lib/decorators/with */ 853);
+		var unhandledRejection = __webpack_require__(/*! ./lib/decorators/unhandledRejection */ 854);
+		var TimeoutError = __webpack_require__(/*! ./lib/TimeoutError */ 844);
 	
 		var Promise = [array, flow, fold, generate, progress,
 			inspect, withThis, timed, unhandledRejection]
 			.reduce(function(Promise, feature) {
 				return feature(Promise);
-			}, __webpack_require__(/*! ./lib/Promise */ 855));
+			}, __webpack_require__(/*! ./lib/Promise */ 856));
 	
-		var apply = __webpack_require__(/*! ./lib/apply */ 846)(Promise);
+		var apply = __webpack_require__(/*! ./lib/apply */ 847)(Promise);
 	
 		// Public API
 	
@@ -63324,7 +63370,7 @@
 
 
 /***/ },
-/* 840 */
+/* 841 */
 /*!*******************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/decorators/timed.js ***!
   \*******************************************************************/
@@ -63337,8 +63383,8 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	
-		var env = __webpack_require__(/*! ../env */ 841);
-		var TimeoutError = __webpack_require__(/*! ../TimeoutError */ 843);
+		var env = __webpack_require__(/*! ../env */ 842);
+		var TimeoutError = __webpack_require__(/*! ../TimeoutError */ 844);
 	
 		function setTimeout(f, ms, x, y) {
 			return env.setTimer(function() {
@@ -63411,7 +63457,7 @@
 
 
 /***/ },
-/* 841 */
+/* 842 */
 /*!******************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/env.js ***!
   \******************************************************/
@@ -63448,7 +63494,7 @@
 	
 		} else if (!capturedSetTimeout) { // vert.x
 			var vertxRequire = require;
-			var vertx = __webpack_require__(/*! vertx */ 842);
+			var vertx = __webpack_require__(/*! vertx */ 843);
 			setTimer = function (f, ms) { return vertx.setTimer(ms, f); };
 			clearTimer = vertx.cancelTimer;
 			asap = vertx.runOnLoop || vertx.runOnContext;
@@ -63494,7 +63540,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39)))
 
 /***/ },
-/* 842 */
+/* 843 */
 /*!***********************!*\
   !*** vertx (ignored) ***!
   \***********************/
@@ -63503,7 +63549,7 @@
 	/* (ignored) */
 
 /***/ },
-/* 843 */
+/* 844 */
 /*!***************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/TimeoutError.js ***!
   \***************************************************************/
@@ -63538,7 +63584,7 @@
 	}(__webpack_require__(/*! !webpack amd define */ 812)));
 
 /***/ },
-/* 844 */
+/* 845 */
 /*!*******************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/decorators/array.js ***!
   \*******************************************************************/
@@ -63551,8 +63597,8 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	
-		var state = __webpack_require__(/*! ../state */ 845);
-		var applier = __webpack_require__(/*! ../apply */ 846);
+		var state = __webpack_require__(/*! ../state */ 846);
+		var applier = __webpack_require__(/*! ../apply */ 847);
 	
 		return function array(Promise) {
 	
@@ -63836,7 +63882,7 @@
 
 
 /***/ },
-/* 845 */
+/* 846 */
 /*!********************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/state.js ***!
   \********************************************************/
@@ -63880,7 +63926,7 @@
 
 
 /***/ },
-/* 846 */
+/* 847 */
 /*!********************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/apply.js ***!
   \********************************************************/
@@ -63944,7 +63990,7 @@
 
 
 /***/ },
-/* 847 */
+/* 848 */
 /*!******************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/decorators/flow.js ***!
   \******************************************************************/
@@ -64113,7 +64159,7 @@
 
 
 /***/ },
-/* 848 */
+/* 849 */
 /*!******************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/decorators/fold.js ***!
   \******************************************************************/
@@ -64149,7 +64195,7 @@
 
 
 /***/ },
-/* 849 */
+/* 850 */
 /*!*********************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/decorators/inspect.js ***!
   \*********************************************************************/
@@ -64162,7 +64208,7 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	
-		var inspect = __webpack_require__(/*! ../state */ 845).inspect;
+		var inspect = __webpack_require__(/*! ../state */ 846).inspect;
 	
 		return function inspection(Promise) {
 	
@@ -64178,7 +64224,7 @@
 
 
 /***/ },
-/* 850 */
+/* 851 */
 /*!*********************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/decorators/iterate.js ***!
   \*********************************************************************/
@@ -64252,7 +64298,7 @@
 
 
 /***/ },
-/* 851 */
+/* 852 */
 /*!**********************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/decorators/progress.js ***!
   \**********************************************************************/
@@ -64285,7 +64331,7 @@
 
 
 /***/ },
-/* 852 */
+/* 853 */
 /*!******************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/decorators/with.js ***!
   \******************************************************************/
@@ -64332,7 +64378,7 @@
 
 
 /***/ },
-/* 853 */
+/* 854 */
 /*!********************************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/decorators/unhandledRejection.js ***!
   \********************************************************************************/
@@ -64345,8 +64391,8 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function(require) {
 	
-		var setTimer = __webpack_require__(/*! ../env */ 841).setTimer;
-		var format = __webpack_require__(/*! ../format */ 854);
+		var setTimer = __webpack_require__(/*! ../env */ 842).setTimer;
+		var format = __webpack_require__(/*! ../format */ 855);
 	
 		return function unhandledRejection(Promise) {
 	
@@ -64427,7 +64473,7 @@
 
 
 /***/ },
-/* 854 */
+/* 855 */
 /*!*********************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/format.js ***!
   \*********************************************************/
@@ -64492,7 +64538,7 @@
 
 
 /***/ },
-/* 855 */
+/* 856 */
 /*!**********************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/Promise.js ***!
   \**********************************************************/
@@ -64505,9 +64551,9 @@
 	(function(define) { 'use strict';
 	!(__WEBPACK_AMD_DEFINE_RESULT__ = function (require) {
 	
-		var makePromise = __webpack_require__(/*! ./makePromise */ 856);
-		var Scheduler = __webpack_require__(/*! ./Scheduler */ 857);
-		var async = __webpack_require__(/*! ./env */ 841).asap;
+		var makePromise = __webpack_require__(/*! ./makePromise */ 857);
+		var Scheduler = __webpack_require__(/*! ./Scheduler */ 858);
+		var async = __webpack_require__(/*! ./env */ 842).asap;
 	
 		return makePromise({
 			scheduler: new Scheduler(async)
@@ -64518,7 +64564,7 @@
 
 
 /***/ },
-/* 856 */
+/* 857 */
 /*!**************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/makePromise.js ***!
   \**************************************************************/
@@ -65455,7 +65501,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39)))
 
 /***/ },
-/* 857 */
+/* 858 */
 /*!************************************************************!*\
   !*** ./~/mp3-duration/~/promisify/~/when/lib/Scheduler.js ***!
   \************************************************************/
@@ -65544,7 +65590,7 @@
 
 
 /***/ },
-/* 858 */
+/* 859 */
 /*!***********************************************!*\
   !*** ./~/mp3-duration/~/promisify/pstream.js ***!
   \***********************************************/
@@ -65552,7 +65598,7 @@
 
 	'use strict';
 	
-	var when = __webpack_require__(/*! when */ 839);
+	var when = __webpack_require__(/*! when */ 840);
 	
 	function merge_objects(a, b) {
 	    for (var prop in b) {
@@ -65736,7 +65782,7 @@
 
 
 /***/ },
-/* 859 */
+/* 860 */
 /*!****************************************!*\
   !*** ./~/musicmetadata/lib/browser.js ***!
   \****************************************/
@@ -65744,10 +65790,10 @@
 
 	/* WEBPACK VAR INJECTION */(function(process, Buffer) {'use strict'
 	/*jslint browser: true*/
-	var readStream = __webpack_require__(/*! filereader-stream */ 860)
-	var through = __webpack_require__(/*! through */ 863)
-	var musicmetadata = __webpack_require__(/*! ./index */ 881)
-	var isStream = __webpack_require__(/*! is-stream */ 903)
+	var readStream = __webpack_require__(/*! filereader-stream */ 861)
+	var through = __webpack_require__(/*! through */ 864)
+	var musicmetadata = __webpack_require__(/*! ./index */ 882)
+	var isStream = __webpack_require__(/*! is-stream */ 904)
 	
 	module.exports = function (stream, opts, callback) {
 	  return musicmetadata(wrapFileWithStream(stream), opts, callback)
@@ -65796,17 +65842,17 @@
 	  return throughStream
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39), __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39), __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer))
 
 /***/ },
-/* 860 */
+/* 861 */
 /*!******************************************************!*\
   !*** ./~/musicmetadata/~/filereader-stream/index.js ***!
   \******************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(Buffer) {var inherits = __webpack_require__(/*! inherits */ 861)
-	var EventEmitter = __webpack_require__(/*! events */ 862).EventEmitter
+	/* WEBPACK VAR INJECTION */(function(Buffer) {var inherits = __webpack_require__(/*! inherits */ 862)
+	var EventEmitter = __webpack_require__(/*! events */ 863).EventEmitter
 	
 	module.exports = FileStream
 	
@@ -65900,10 +65946,10 @@
 	}
 	
 	inherits(FileStream, EventEmitter)
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer))
 
 /***/ },
-/* 861 */
+/* 862 */
 /*!********************************************************************!*\
   !*** ./~/musicmetadata/~/filereader-stream/~/inherits/inherits.js ***!
   \********************************************************************/
@@ -65941,7 +65987,7 @@
 
 
 /***/ },
-/* 862 */
+/* 863 */
 /*!********************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/events/events.js ***!
   \********************************************************/
@@ -66252,13 +66298,13 @@
 
 
 /***/ },
-/* 863 */
+/* 864 */
 /*!********************************************!*\
   !*** ./~/musicmetadata/~/through/index.js ***!
   \********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(process) {var Stream = __webpack_require__(/*! stream */ 864)
+	/* WEBPACK VAR INJECTION */(function(process) {var Stream = __webpack_require__(/*! stream */ 865)
 	
 	// through
 	//
@@ -66370,7 +66416,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39)))
 
 /***/ },
-/* 864 */
+/* 865 */
 /*!******************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/stream-browserify/index.js ***!
   \******************************************************************/
@@ -66399,15 +66445,15 @@
 	
 	module.exports = Stream;
 	
-	var EE = __webpack_require__(/*! events */ 862).EventEmitter;
-	var inherits = __webpack_require__(/*! inherits */ 865);
+	var EE = __webpack_require__(/*! events */ 863).EventEmitter;
+	var inherits = __webpack_require__(/*! inherits */ 866);
 	
 	inherits(Stream, EE);
-	Stream.Readable = __webpack_require__(/*! readable-stream/readable.js */ 866);
-	Stream.Writable = __webpack_require__(/*! readable-stream/writable.js */ 877);
-	Stream.Duplex = __webpack_require__(/*! readable-stream/duplex.js */ 878);
-	Stream.Transform = __webpack_require__(/*! readable-stream/transform.js */ 879);
-	Stream.PassThrough = __webpack_require__(/*! readable-stream/passthrough.js */ 880);
+	Stream.Readable = __webpack_require__(/*! readable-stream/readable.js */ 867);
+	Stream.Writable = __webpack_require__(/*! readable-stream/writable.js */ 878);
+	Stream.Duplex = __webpack_require__(/*! readable-stream/duplex.js */ 879);
+	Stream.Transform = __webpack_require__(/*! readable-stream/transform.js */ 880);
+	Stream.PassThrough = __webpack_require__(/*! readable-stream/passthrough.js */ 881);
 	
 	// Backwards-compat with node 0.4.x
 	Stream.Stream = Stream;
@@ -66506,7 +66552,7 @@
 
 
 /***/ },
-/* 865 */
+/* 866 */
 /*!****************************************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/stream-browserify/~/inherits/inherits_browser.js ***!
   \****************************************************************************************/
@@ -66538,27 +66584,27 @@
 
 
 /***/ },
-/* 866 */
+/* 867 */
 /*!*******************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/readable.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(process) {exports = module.exports = __webpack_require__(/*! ./lib/_stream_readable.js */ 867);
-	exports.Stream = __webpack_require__(/*! stream */ 864);
+	/* WEBPACK VAR INJECTION */(function(process) {exports = module.exports = __webpack_require__(/*! ./lib/_stream_readable.js */ 868);
+	exports.Stream = __webpack_require__(/*! stream */ 865);
 	exports.Readable = exports;
-	exports.Writable = __webpack_require__(/*! ./lib/_stream_writable.js */ 873);
-	exports.Duplex = __webpack_require__(/*! ./lib/_stream_duplex.js */ 872);
-	exports.Transform = __webpack_require__(/*! ./lib/_stream_transform.js */ 875);
-	exports.PassThrough = __webpack_require__(/*! ./lib/_stream_passthrough.js */ 876);
+	exports.Writable = __webpack_require__(/*! ./lib/_stream_writable.js */ 874);
+	exports.Duplex = __webpack_require__(/*! ./lib/_stream_duplex.js */ 873);
+	exports.Transform = __webpack_require__(/*! ./lib/_stream_transform.js */ 876);
+	exports.PassThrough = __webpack_require__(/*! ./lib/_stream_passthrough.js */ 877);
 	if (!process.browser && ({"NODE_ENV":"development"}).READABLE_STREAM === 'disable') {
-	  module.exports = __webpack_require__(/*! stream */ 864);
+	  module.exports = __webpack_require__(/*! stream */ 865);
 	}
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39)))
 
 /***/ },
-/* 867 */
+/* 868 */
 /*!*******************************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/lib/_stream_readable.js ***!
   \*******************************************************************************/
@@ -66588,17 +66634,17 @@
 	module.exports = Readable;
 	
 	/*<replacement>*/
-	var isArray = __webpack_require__(/*! isarray */ 868);
+	var isArray = __webpack_require__(/*! isarray */ 869);
 	/*</replacement>*/
 	
 	
 	/*<replacement>*/
-	var Buffer = __webpack_require__(/*! buffer */ 830).Buffer;
+	var Buffer = __webpack_require__(/*! buffer */ 831).Buffer;
 	/*</replacement>*/
 	
 	Readable.ReadableState = ReadableState;
 	
-	var EE = __webpack_require__(/*! events */ 862).EventEmitter;
+	var EE = __webpack_require__(/*! events */ 863).EventEmitter;
 	
 	/*<replacement>*/
 	if (!EE.listenerCount) EE.listenerCount = function(emitter, type) {
@@ -66606,18 +66652,18 @@
 	};
 	/*</replacement>*/
 	
-	var Stream = __webpack_require__(/*! stream */ 864);
+	var Stream = __webpack_require__(/*! stream */ 865);
 	
 	/*<replacement>*/
-	var util = __webpack_require__(/*! core-util-is */ 869);
-	util.inherits = __webpack_require__(/*! inherits */ 870);
+	var util = __webpack_require__(/*! core-util-is */ 870);
+	util.inherits = __webpack_require__(/*! inherits */ 871);
 	/*</replacement>*/
 	
 	var StringDecoder;
 	
 	
 	/*<replacement>*/
-	var debug = __webpack_require__(/*! util */ 871);
+	var debug = __webpack_require__(/*! util */ 872);
 	if (debug && debug.debuglog) {
 	  debug = debug.debuglog('stream');
 	} else {
@@ -66629,7 +66675,7 @@
 	util.inherits(Readable, Stream);
 	
 	function ReadableState(options, stream) {
-	  var Duplex = __webpack_require__(/*! ./_stream_duplex */ 872);
+	  var Duplex = __webpack_require__(/*! ./_stream_duplex */ 873);
 	
 	  options = options || {};
 	
@@ -66690,14 +66736,14 @@
 	  this.encoding = null;
 	  if (options.encoding) {
 	    if (!StringDecoder)
-	      StringDecoder = __webpack_require__(/*! string_decoder/ */ 874).StringDecoder;
+	      StringDecoder = __webpack_require__(/*! string_decoder/ */ 875).StringDecoder;
 	    this.decoder = new StringDecoder(options.encoding);
 	    this.encoding = options.encoding;
 	  }
 	}
 	
 	function Readable(options) {
-	  var Duplex = __webpack_require__(/*! ./_stream_duplex */ 872);
+	  var Duplex = __webpack_require__(/*! ./_stream_duplex */ 873);
 	
 	  if (!(this instanceof Readable))
 	    return new Readable(options);
@@ -66800,7 +66846,7 @@
 	// backwards compatibility.
 	Readable.prototype.setEncoding = function(enc) {
 	  if (!StringDecoder)
-	    StringDecoder = __webpack_require__(/*! string_decoder/ */ 874).StringDecoder;
+	    StringDecoder = __webpack_require__(/*! string_decoder/ */ 875).StringDecoder;
 	  this._readableState.decoder = new StringDecoder(enc);
 	  this._readableState.encoding = enc;
 	  return this;
@@ -67519,7 +67565,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39)))
 
 /***/ },
-/* 868 */
+/* 869 */
 /*!**************************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/~/isarray/index.js ***!
   \**************************************************************************/
@@ -67531,7 +67577,7 @@
 
 
 /***/ },
-/* 869 */
+/* 870 */
 /*!**********************************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/~/core-util-is/lib/util.js ***!
   \**********************************************************************************/
@@ -67645,10 +67691,10 @@
 	  return Object.prototype.toString.call(o);
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer))
 
 /***/ },
-/* 870 */
+/* 871 */
 /*!**************************************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/~/inherits/inherits_browser.js ***!
   \**************************************************************************************/
@@ -67680,7 +67726,7 @@
 
 
 /***/ },
-/* 871 */
+/* 872 */
 /*!**********************!*\
   !*** util (ignored) ***!
   \**********************/
@@ -67689,7 +67735,7 @@
 	/* (ignored) */
 
 /***/ },
-/* 872 */
+/* 873 */
 /*!*****************************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/lib/_stream_duplex.js ***!
   \*****************************************************************************/
@@ -67733,12 +67779,12 @@
 	
 	
 	/*<replacement>*/
-	var util = __webpack_require__(/*! core-util-is */ 869);
-	util.inherits = __webpack_require__(/*! inherits */ 870);
+	var util = __webpack_require__(/*! core-util-is */ 870);
+	util.inherits = __webpack_require__(/*! inherits */ 871);
 	/*</replacement>*/
 	
-	var Readable = __webpack_require__(/*! ./_stream_readable */ 867);
-	var Writable = __webpack_require__(/*! ./_stream_writable */ 873);
+	var Readable = __webpack_require__(/*! ./_stream_readable */ 868);
+	var Writable = __webpack_require__(/*! ./_stream_writable */ 874);
 	
 	util.inherits(Duplex, Readable);
 	
@@ -67788,7 +67834,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39)))
 
 /***/ },
-/* 873 */
+/* 874 */
 /*!*******************************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/lib/_stream_writable.js ***!
   \*******************************************************************************/
@@ -67822,18 +67868,18 @@
 	module.exports = Writable;
 	
 	/*<replacement>*/
-	var Buffer = __webpack_require__(/*! buffer */ 830).Buffer;
+	var Buffer = __webpack_require__(/*! buffer */ 831).Buffer;
 	/*</replacement>*/
 	
 	Writable.WritableState = WritableState;
 	
 	
 	/*<replacement>*/
-	var util = __webpack_require__(/*! core-util-is */ 869);
-	util.inherits = __webpack_require__(/*! inherits */ 870);
+	var util = __webpack_require__(/*! core-util-is */ 870);
+	util.inherits = __webpack_require__(/*! inherits */ 871);
 	/*</replacement>*/
 	
-	var Stream = __webpack_require__(/*! stream */ 864);
+	var Stream = __webpack_require__(/*! stream */ 865);
 	
 	util.inherits(Writable, Stream);
 	
@@ -67844,7 +67890,7 @@
 	}
 	
 	function WritableState(options, stream) {
-	  var Duplex = __webpack_require__(/*! ./_stream_duplex */ 872);
+	  var Duplex = __webpack_require__(/*! ./_stream_duplex */ 873);
 	
 	  options = options || {};
 	
@@ -67932,7 +67978,7 @@
 	}
 	
 	function Writable(options) {
-	  var Duplex = __webpack_require__(/*! ./_stream_duplex */ 872);
+	  var Duplex = __webpack_require__(/*! ./_stream_duplex */ 873);
 	
 	  // Writable ctor is applied to Duplexes, though they're not
 	  // instanceof Writable, they're instanceof Readable.
@@ -68275,7 +68321,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39)))
 
 /***/ },
-/* 874 */
+/* 875 */
 /*!***************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/string_decoder/index.js ***!
   \***************************************************************/
@@ -68302,7 +68348,7 @@
 	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 	// USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
-	var Buffer = __webpack_require__(/*! buffer */ 830).Buffer;
+	var Buffer = __webpack_require__(/*! buffer */ 831).Buffer;
 	
 	var isBufferEncoding = Buffer.isEncoding
 	  || function(encoding) {
@@ -68505,7 +68551,7 @@
 
 
 /***/ },
-/* 875 */
+/* 876 */
 /*!********************************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/lib/_stream_transform.js ***!
   \********************************************************************************/
@@ -68577,11 +68623,11 @@
 	
 	module.exports = Transform;
 	
-	var Duplex = __webpack_require__(/*! ./_stream_duplex */ 872);
+	var Duplex = __webpack_require__(/*! ./_stream_duplex */ 873);
 	
 	/*<replacement>*/
-	var util = __webpack_require__(/*! core-util-is */ 869);
-	util.inherits = __webpack_require__(/*! inherits */ 870);
+	var util = __webpack_require__(/*! core-util-is */ 870);
+	util.inherits = __webpack_require__(/*! inherits */ 871);
 	/*</replacement>*/
 	
 	util.inherits(Transform, Duplex);
@@ -68723,7 +68769,7 @@
 
 
 /***/ },
-/* 876 */
+/* 877 */
 /*!**********************************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/lib/_stream_passthrough.js ***!
   \**********************************************************************************/
@@ -68756,11 +68802,11 @@
 	
 	module.exports = PassThrough;
 	
-	var Transform = __webpack_require__(/*! ./_stream_transform */ 875);
+	var Transform = __webpack_require__(/*! ./_stream_transform */ 876);
 	
 	/*<replacement>*/
-	var util = __webpack_require__(/*! core-util-is */ 869);
-	util.inherits = __webpack_require__(/*! inherits */ 870);
+	var util = __webpack_require__(/*! core-util-is */ 870);
+	util.inherits = __webpack_require__(/*! inherits */ 871);
 	/*</replacement>*/
 	
 	util.inherits(PassThrough, Transform);
@@ -68778,57 +68824,57 @@
 
 
 /***/ },
-/* 877 */
+/* 878 */
 /*!*******************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/writable.js ***!
   \*******************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(/*! ./lib/_stream_writable.js */ 873)
+	module.exports = __webpack_require__(/*! ./lib/_stream_writable.js */ 874)
 
 
 /***/ },
-/* 878 */
+/* 879 */
 /*!*****************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/duplex.js ***!
   \*****************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(/*! ./lib/_stream_duplex.js */ 872)
+	module.exports = __webpack_require__(/*! ./lib/_stream_duplex.js */ 873)
 
 
 /***/ },
-/* 879 */
+/* 880 */
 /*!********************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/transform.js ***!
   \********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(/*! ./lib/_stream_transform.js */ 875)
+	module.exports = __webpack_require__(/*! ./lib/_stream_transform.js */ 876)
 
 
 /***/ },
-/* 880 */
+/* 881 */
 /*!**********************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/readable-stream/passthrough.js ***!
   \**********************************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(/*! ./lib/_stream_passthrough.js */ 876)
+	module.exports = __webpack_require__(/*! ./lib/_stream_passthrough.js */ 877)
 
 
 /***/ },
-/* 881 */
+/* 882 */
 /*!**************************************!*\
   !*** ./~/musicmetadata/lib/index.js ***!
   \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process, Buffer) {'use strict'
-	var events = __webpack_require__(/*! events */ 862)
-	var common = __webpack_require__(/*! ./common */ 882)
-	var strtok = __webpack_require__(/*! strtok2 */ 883)
-	var through = __webpack_require__(/*! through */ 863)
+	var events = __webpack_require__(/*! events */ 863)
+	var common = __webpack_require__(/*! ./common */ 883)
+	var strtok = __webpack_require__(/*! strtok2 */ 884)
+	var through = __webpack_require__(/*! through */ 864)
 	var fs = __webpack_require__(/*! fs */ 808)
 	
 	module.exports = function (stream, opts, callback) {
@@ -69048,49 +69094,49 @@
 	var headerTypes = [
 	  {
 	    buf: common.asfGuidBuf,
-	    tag: __webpack_require__(/*! ./asf */ 893)
+	    tag: __webpack_require__(/*! ./asf */ 894)
 	  },
 	  {
 	    buf: new Buffer('ID3'),
-	    tag: __webpack_require__(/*! ./id3v2 */ 894)
+	    tag: __webpack_require__(/*! ./id3v2 */ 895)
 	  },
 	  {
 	    buf: new Buffer('ftypM4A'),
-	    tag: __webpack_require__(/*! ./id4 */ 896),
+	    tag: __webpack_require__(/*! ./id4 */ 897),
 	    offset: 4
 	  },
 	  {
 	    buf: new Buffer('ftypmp42'),
-	    tag: __webpack_require__(/*! ./id4 */ 896),
+	    tag: __webpack_require__(/*! ./id4 */ 897),
 	    offset: 4
 	  },
 	  {
 	    buf: new Buffer('OggS'),
-	    tag: __webpack_require__(/*! ./ogg */ 897)
+	    tag: __webpack_require__(/*! ./ogg */ 898)
 	  },
 	  {
 	    buf: new Buffer('fLaC'),
-	    tag: __webpack_require__(/*! ./flac */ 901)
+	    tag: __webpack_require__(/*! ./flac */ 902)
 	  },
 	  {
 	    buf: new Buffer('MAC'),
-	    tag: __webpack_require__(/*! ./monkeysaudio */ 902)
+	    tag: __webpack_require__(/*! ./monkeysaudio */ 903)
 	  }
 	]
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39), __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39), __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer))
 
 /***/ },
-/* 882 */
+/* 883 */
 /*!***************************************!*\
   !*** ./~/musicmetadata/lib/common.js ***!
   \***************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict'
-	var strtok = __webpack_require__(/*! strtok2 */ 883)
-	var equal = __webpack_require__(/*! deep-equal */ 888)
-	var windows1252decoder = __webpack_require__(/*! ./windows1252decoder */ 891)
+	var strtok = __webpack_require__(/*! strtok2 */ 884)
+	var equal = __webpack_require__(/*! deep-equal */ 889)
+	var windows1252decoder = __webpack_require__(/*! ./windows1252decoder */ 892)
 	
 	var asfGuidBuf = new Buffer([
 	  0x30, 0x26, 0xB2, 0x75, 0x8E, 0x66, 0xCF, 0x11,
@@ -69108,7 +69154,7 @@
 	    }
 	  }
 	  // default to id3v1.1 if we cannot detect any other tags
-	  return __webpack_require__(/*! ./id3v1 */ 892)
+	  return __webpack_require__(/*! ./id3v1 */ 893)
 	}
 	
 	exports.streamOnRealEnd = function (stream, callback) {
@@ -69321,10 +69367,10 @@
 	  'Garage Rock', 'Psybient'
 	]
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer))
 
 /***/ },
-/* 883 */
+/* 884 */
 /*!*************************************************!*\
   !*** ./~/musicmetadata/~/strtok2/lib/strtok.js ***!
   \*************************************************/
@@ -69332,8 +69378,8 @@
 
 	// A fast streaming parser library.
 	
-	var assert = __webpack_require__(/*! assert */ 884);
-	var Buffer = __webpack_require__(/*! buffer */ 830).Buffer;
+	var assert = __webpack_require__(/*! assert */ 885);
+	var Buffer = __webpack_require__(/*! buffer */ 831).Buffer;
 	
 	// Buffer for parse() to handle types that span more than one buffer
 	var SPANNING_BUF = new Buffer(1024);
@@ -69757,7 +69803,7 @@
 
 
 /***/ },
-/* 884 */
+/* 885 */
 /*!********************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/assert/assert.js ***!
   \********************************************************/
@@ -69831,7 +69877,7 @@
 	// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	
-	var util = __webpack_require__(/*! util/ */ 885);
+	var util = __webpack_require__(/*! util/ */ 886);
 	var hasOwn = Object.prototype.hasOwnProperty;
 	var pSlice = Array.prototype.slice;
 	var functionsHaveNames = (function () {
@@ -70257,7 +70303,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 885 */
+/* 886 */
 /*!****************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/util/util.js ***!
   \****************************************************/
@@ -70788,7 +70834,7 @@
 	}
 	exports.isPrimitive = isPrimitive;
 	
-	exports.isBuffer = __webpack_require__(/*! ./support/isBuffer */ 886);
+	exports.isBuffer = __webpack_require__(/*! ./support/isBuffer */ 887);
 	
 	function objectToString(o) {
 	  return Object.prototype.toString.call(o);
@@ -70832,7 +70878,7 @@
 	 *     prototype.
 	 * @param {function} superCtor Constructor function to inherit prototype from.
 	 */
-	exports.inherits = __webpack_require__(/*! inherits */ 887);
+	exports.inherits = __webpack_require__(/*! inherits */ 888);
 	
 	exports._extend = function(origin, add) {
 	  // Don't do anything if add isn't an object
@@ -70853,7 +70899,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(/*! (webpack)/~/node-libs-browser/~/process/browser.js */ 39)))
 
 /***/ },
-/* 886 */
+/* 887 */
 /*!***********************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/util/support/isBufferBrowser.js ***!
   \***********************************************************************/
@@ -70867,7 +70913,7 @@
 	}
 
 /***/ },
-/* 887 */
+/* 888 */
 /*!***************************************************************************!*\
   !*** (webpack)/~/node-libs-browser/~/util/~/inherits/inherits_browser.js ***!
   \***************************************************************************/
@@ -70899,15 +70945,15 @@
 
 
 /***/ },
-/* 888 */
+/* 889 */
 /*!***********************************************!*\
   !*** ./~/musicmetadata/~/deep-equal/index.js ***!
   \***********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var pSlice = Array.prototype.slice;
-	var objectKeys = __webpack_require__(/*! ./lib/keys.js */ 889);
-	var isArguments = __webpack_require__(/*! ./lib/is_arguments.js */ 890);
+	var objectKeys = __webpack_require__(/*! ./lib/keys.js */ 890);
+	var isArguments = __webpack_require__(/*! ./lib/is_arguments.js */ 891);
 	
 	var deepEqual = module.exports = function (actual, expected, opts) {
 	  if (!opts) opts = {};
@@ -71002,7 +71048,7 @@
 
 
 /***/ },
-/* 889 */
+/* 890 */
 /*!**************************************************!*\
   !*** ./~/musicmetadata/~/deep-equal/lib/keys.js ***!
   \**************************************************/
@@ -71020,7 +71066,7 @@
 
 
 /***/ },
-/* 890 */
+/* 891 */
 /*!**********************************************************!*\
   !*** ./~/musicmetadata/~/deep-equal/lib/is_arguments.js ***!
   \**********************************************************/
@@ -71049,7 +71095,7 @@
 
 
 /***/ },
-/* 891 */
+/* 892 */
 /*!***************************************************!*\
   !*** ./~/musicmetadata/lib/windows1252decoder.js ***!
   \***************************************************/
@@ -71101,14 +71147,14 @@
 
 
 /***/ },
-/* 892 */
+/* 893 */
 /*!**************************************!*\
   !*** ./~/musicmetadata/lib/id3v1.js ***!
   \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
-	var common = __webpack_require__(/*! ./common */ 882)
+	var common = __webpack_require__(/*! ./common */ 883)
 	
 	module.exports = function (stream, callback, done) {
 	  var endData = null
@@ -71150,16 +71196,16 @@
 
 
 /***/ },
-/* 893 */
+/* 894 */
 /*!************************************!*\
   !*** ./~/musicmetadata/lib/asf.js ***!
   \************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict'
-	var strtok = __webpack_require__(/*! strtok2 */ 883)
-	var common = __webpack_require__(/*! ./common */ 882)
-	var equal = __webpack_require__(/*! deep-equal */ 888)
+	var strtok = __webpack_require__(/*! strtok2 */ 884)
+	var common = __webpack_require__(/*! ./common */ 883)
+	var equal = __webpack_require__(/*! deep-equal */ 889)
 	
 	var decodeString = common.decodeString
 	
@@ -71404,19 +71450,19 @@
 	  return ((low * maxuint32) + (high >>> 0))
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer))
 
 /***/ },
-/* 894 */
+/* 895 */
 /*!**************************************!*\
   !*** ./~/musicmetadata/lib/id3v2.js ***!
   \**************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict'
-	var strtok = __webpack_require__(/*! strtok2 */ 883)
-	var parser = __webpack_require__(/*! ./id3v2_frames */ 895)
-	var common = __webpack_require__(/*! ./common */ 882)
+	var strtok = __webpack_require__(/*! strtok2 */ 884)
+	var parser = __webpack_require__(/*! ./id3v2_frames */ 896)
+	var common = __webpack_require__(/*! ./common */ 883)
 	
 	module.exports = function (stream, callback, done, readDuration, fileSize) {
 	  var frameCount = 0
@@ -71813,19 +71859,19 @@
 	  return sampling_rate_freq_index[version][bits]
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer))
 
 /***/ },
-/* 895 */
+/* 896 */
 /*!*********************************************!*\
   !*** ./~/musicmetadata/lib/id3v2_frames.js ***!
   \*********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
-	var Buffer = __webpack_require__(/*! buffer */ 830).Buffer
-	var strtok = __webpack_require__(/*! strtok2 */ 883)
-	var common = __webpack_require__(/*! ./common */ 882)
+	var Buffer = __webpack_require__(/*! buffer */ 831).Buffer
+	var strtok = __webpack_require__(/*! strtok2 */ 884)
+	var common = __webpack_require__(/*! ./common */ 883)
 	var findZero = common.findZero
 	var decodeString = common.decodeString
 	
@@ -71960,15 +72006,15 @@
 
 
 /***/ },
-/* 896 */
+/* 897 */
 /*!************************************!*\
   !*** ./~/musicmetadata/lib/id4.js ***!
   \************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict'
-	var strtok = __webpack_require__(/*! strtok2 */ 883)
-	var common = __webpack_require__(/*! ./common */ 882)
+	var strtok = __webpack_require__(/*! strtok2 */ 884)
+	var common = __webpack_require__(/*! ./common */ 883)
 	
 	module.exports = function (stream, callback, done, readDuration) {
 	  strtok.parse(stream, function (v, cb) {
@@ -72107,20 +72153,20 @@
 	
 	var CONTAINER_ATOMS = ['moov', 'udta', 'meta', 'ilst', 'trak', 'mdia']
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer))
 
 /***/ },
-/* 897 */
+/* 898 */
 /*!************************************!*\
   !*** ./~/musicmetadata/lib/ogg.js ***!
   \************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict'
-	var events = __webpack_require__(/*! events */ 862)
-	var strtok = __webpack_require__(/*! strtok2 */ 883)
-	var common = __webpack_require__(/*! ./common */ 882)
-	var sum = __webpack_require__(/*! sum-component */ 898)
+	var events = __webpack_require__(/*! events */ 863)
+	var strtok = __webpack_require__(/*! strtok2 */ 884)
+	var common = __webpack_require__(/*! ./common */ 883)
+	var sum = __webpack_require__(/*! sum-component */ 899)
 	
 	module.exports = function (stream, callback, done, readDuration) {
 	  var innerStream = new events.EventEmitter()
@@ -72258,10 +72304,10 @@
 	  })
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer))
 
 /***/ },
-/* 898 */
+/* 899 */
 /*!**************************************************!*\
   !*** ./~/musicmetadata/~/sum-component/index.js ***!
   \**************************************************/
@@ -72272,7 +72318,7 @@
 	 * Module dependencies.
 	 */
 	
-	var toFunction = __webpack_require__(/*! to-function */ 899);
+	var toFunction = __webpack_require__(/*! to-function */ 900);
 	
 	/**
 	 * Sum the given `arr` with callback `fn(val, i)`.
@@ -72306,7 +72352,7 @@
 
 
 /***/ },
-/* 899 */
+/* 900 */
 /*!****************************************************************!*\
   !*** ./~/musicmetadata/~/sum-component/~/to-function/index.js ***!
   \****************************************************************/
@@ -72319,9 +72365,9 @@
 	
 	var expr;
 	try {
-	  expr = __webpack_require__(/*! props */ 900);
+	  expr = __webpack_require__(/*! props */ 901);
 	} catch(e) {
-	  expr = __webpack_require__(/*! component-props */ 900);
+	  expr = __webpack_require__(/*! component-props */ 901);
 	}
 	
 	/**
@@ -72467,7 +72513,7 @@
 
 
 /***/ },
-/* 900 */
+/* 901 */
 /*!**********************************************************************************!*\
   !*** ./~/musicmetadata/~/sum-component/~/to-function/~/component-props/index.js ***!
   \**********************************************************************************/
@@ -72561,15 +72607,15 @@
 
 
 /***/ },
-/* 901 */
+/* 902 */
 /*!*************************************!*\
   !*** ./~/musicmetadata/lib/flac.js ***!
   \*************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict'
-	var strtok = __webpack_require__(/*! strtok2 */ 883)
-	var common = __webpack_require__(/*! ./common */ 882)
+	var strtok = __webpack_require__(/*! strtok2 */ 884)
+	var common = __webpack_require__(/*! ./common */ 883)
 	
 	module.exports = function (stream, callback, done) {
 	  var currentState = startState
@@ -72689,15 +72735,15 @@
 
 
 /***/ },
-/* 902 */
+/* 903 */
 /*!*********************************************!*\
   !*** ./~/musicmetadata/lib/monkeysaudio.js ***!
   \*********************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(Buffer) {'use strict'
-	var common = __webpack_require__(/*! ./common */ 882)
-	var strtok = __webpack_require__(/*! strtok2 */ 883)
+	var common = __webpack_require__(/*! ./common */ 883)
+	var strtok = __webpack_require__(/*! strtok2 */ 884)
 	
 	module.exports = function (stream, callback, done) {
 	  var bufs = []
@@ -72764,10 +72810,10 @@
 	  })
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 830).Buffer))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(/*! (webpack)/~/node-libs-browser/~/buffer/index.js */ 831).Buffer))
 
 /***/ },
-/* 903 */
+/* 904 */
 /*!**********************************************!*\
   !*** ./~/musicmetadata/~/is-stream/index.js ***!
   \**********************************************/
@@ -72795,40 +72841,6 @@
 		return isStream.duplex(stream) && typeof stream._transform === 'function' && typeof stream._transformState === 'object';
 	};
 
-
-/***/ },
-/* 904 */
-/*!*******************************************!*\
-  !*** ./server/utils/openCordovaWebSql.js ***!
-  \*******************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	
-	var _path = __webpack_require__(/*! path */ 501);
-	
-	var _path2 = _interopRequireDefault(_path);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	/* global window, cordova */
-	exports.default = function (filename) {
-	  return new Promise(function (resolve, reject) {
-	    if (window && window.sqlitePlugin) {
-	      window.resolveLocalFileSystemURL(_path2.default.dirname(filename), // `${cordova.file.externalRootDirectory}/Music`,
-	      function (externalDataDirectoryEntry) {
-	        resolve(window.sqlitePlugin.openDatabase({
-	          name: _path2.default.basename(filename),
-	          androidDatabaseLocation: externalDataDirectoryEntry.toURL()
-	        }));
-	      }, reject);
-	    } else reject('sqlitePlugin no found');
-	  });
-	};
 
 /***/ }
 /******/ ]);
