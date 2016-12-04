@@ -82,41 +82,55 @@
 	var unlink = (0, _denodeify2.default)(_fs2.default.unlink);
 	var readFile = (0, _denodeify2.default)(_fs2.default.readFile);
 	
-	function log(msg) {
+	window.addEventListener('load', function () {
 	  var el = document.getElementById('log');
-	  if (!el) alert('el not found');
-	  el.innerHTML = el.innerHTML + '<pre>' + msg + '</pre>';
-	}
+	  function log(msg) {
+	    el.innerHTML = el.innerHTML + '<pre>' + msg + '</pre>';
+	    navigator.notification.alert(msg, // message
+	    function () {}, // callback
+	    'Game Over', // title
+	    'Done' // buttonName
+	    );
+	  }
 	
-	log('comenzando');
+	  // log('comenzando');
 	
-	document.addEventListener('deviceready', function () {
-	  log('arranque');
-	  var DELDB = false;
-	  var musicDb = (0, _path.join)(cordova.file.externalRootDirectory, 'Music/RoxyMusic.db');
+	  document.addEventListener('deviceready', function () {
+	    if (!el) {
+	      alert('el not found');
+	      navigator.notification.alert('el not found', // message
+	      function () {}, // callback
+	      'Game Over', // title
+	      'Done' // buttonName
+	      );
+	    }
+	    log('arranque');
+	    var DELDB = false;
+	    var musicDb = (0, _path.join)(cordova.file.externalRootDirectory, 'Music/RoxyMusic.db');
 	
-	  log('musicdb: ' + musicDb);
-	  (DELDB ? unlink(musicDb) : Promise.resolve()).then(function () {
-	    return (0, _openCordovaWebSql2.default)(musicDb);
-	  }).then(function (rawDb) {
-	    log('database opened');
-	    return new _webSqlP2.default(rawDb);
-	  }).then(function (db) {
-	    return db.get('select count(*) as c  from sqlite_master').then(function (row) {
-	      log('red row ' + JSON.stringify(row));
-	      return row.c === 0 ? readFile((0, _path.join)(cordova.file.applicationDirectory, 'res/data.sql'), 'utf8').then(function (data) {
-	        log('data read ' + data.substr(0, 200));
-	        return db.exec(data);
-	      }).then(function () {
-	        return db;
-	      }) : db;
+	    log('musicdb: ' + musicDb);
+	    (DELDB ? unlink(musicDb) : Promise.resolve()).then(function () {
+	      return (0, _openCordovaWebSql2.default)(musicDb);
+	    }).then(function (rawDb) {
+	      log('database opened');
+	      return new _webSqlP2.default(rawDb);
+	    }).then(function (db) {
+	      return db.get('select count(*) as c  from sqlite_master').then(function (row) {
+	        log('red row ' + JSON.stringify(row));
+	        return row.c === 0 ? readFile((0, _path.join)(cordova.file.applicationDirectory, 'res/data.sql'), 'utf8').then(function (data) {
+	          log('data read ' + data.substr(0, 200));
+	          return db.exec(data);
+	        }).then(function () {
+	          return db;
+	        }) : db;
+	      });
+	    }).then(function (db) {
+	      return (0, _server2.default)(db, _restAPI.addRoute);
+	    }).then(_client2.default).catch(function (err) {
+	      log('catch: ' + err);
 	    });
-	  }).then(function (db) {
-	    return (0, _server2.default)(db, _restAPI.addRoute);
-	  }).then(_client2.default).catch(function (err) {
-	    log('catch: ' + err);
-	  });
-	}, false);
+	  }, false);
+	});
 
 /***/ },
 /* 1 */
@@ -63463,7 +63477,7 @@
   \******************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var require;var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process) {/** @license MIT License (c) copyright 2010-2014 original author or authors */
+	var __WEBPACK_AMD_DEFINE_RESULT__;var require;/* WEBPACK VAR INJECTION */(function(process) {/** @license MIT License (c) copyright 2010-2014 original author or authors */
 	/** @author Brian Cavalier */
 	/** @author John Hann */
 	

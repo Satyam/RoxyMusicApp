@@ -1,3 +1,25 @@
+/* global window, cordova */
+function openDatabase(filename) {
+  return new Promise(function (resolve, reject) {
+    var lastSlash = filename.lastIndexOf('/');
+    if (window && window.sqlitePlugin) {
+      window.resolveLocalFileSystemURL(
+        filename.substr(0, lastSlash), // `${cordova.file.externalRootDirectory}/Music`,
+        function (externalDataDirectoryEntry) {
+          resolve(window.sqlitePlugin.openDatabase(
+            {
+              name: filename.substr(lastSlash + 1),
+              androidDatabaseLocation: externalDataDirectoryEntry.toURL(),
+            }
+          ));
+        },
+        reject
+      );
+    } else reject('sqlitePlugin no found');
+  });
+}
+
+
 $(function() {
   var $msg = $('#msg');
 
@@ -104,6 +126,12 @@ $(function() {
           );
         }
       });
+      log('about to open ' + cordova.file.externalRootDirectory + 'Music/RoxyMusic.db');
+      openDatabase(cordova.file.externalRootDirectory + 'Music/RoxyMusic.db')
+      .then(function () {
+        log('database open success ');
+      })
+      .catch(errorHandler('openDatabase'));
 
     },
     false

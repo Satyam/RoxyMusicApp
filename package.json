@@ -9,7 +9,7 @@
   "author": "Daniel Barreiro",
   "scripts": {
     "lint": "eslint . || exit 0",
-    "prestart": "cp ../RoxyMusic/bundles/phonegap* www/js && cp ../RoxyMusic/server/data.sql www/res && cp ../RoxyMusic/phonegap/index.html www",
+    "prestart": "cp ../RoxyMusic/bundles/phonegap* www/js && cp ../RoxyMusic/server/data.sql www/res && cp ../RoxyMusic/phonegap/index.html www/phonegap.html",
     "start": "phonegap serve",
     "copy": "cp ../RoxyMusic/bundles/phonegap* www/js  && cp ../RoxyMusic/server/data.sql www/res"
   },
